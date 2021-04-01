@@ -1,0 +1,19 @@
+.cell {
+  width: 32px;
+  height: 32px;
+}
+
+.obstacle {
+  background-color: black;
+}
+
+.weapon {
+  background-color: blue;
+}
+
+.firstPlayer {
+  background-color: red;
+}
+.secondPlayer {
+  background-color: green;
+}
