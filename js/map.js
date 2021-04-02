@@ -38,23 +38,25 @@ class GameMap {
     });
 
     //Generation des armes//
-    const nbWeapon = Math.floor(Math.random() * 4) + 1;
+
+    this.weapons.push(new Weapon("Pistol", 8, 1, "pistol.png"));
+    this.weapons.push(new Weapon("Sniper", 20, 2, "sniper.png"));
+    this.weapons.push(new Weapon("Rocket", 10, 3, "rocket.png"));
+    this.weapons.push(new Weapon("Uzi", 3, 4, "uzi.png"));
+    const nbWeapon = Math.floor(Math.random() * this.weapons.length) + 1;
     const weaponCells = cells.slice(nbObstacle, nbWeapon + nbObstacle);
-    weaponCells.forEach((element) => {
-      element.classList.add("weapon");
-    });
+    console.log(weaponCells);
+    for (let i = 0; i < weaponCells.length; i++) {
+      weaponCells[i].innerHTML = this.weapons[i].type;
+    }
 
     // generation player//
+    this.players.push(new Player("playerOne", "playerOne.png"));
+    this.players.push(new Player("playerTwo", "playerTwo.png"));
     const remainingCells = cells.slice(nbObstacle + nbWeapon);
-    remainingCells[0].classList.add("firstPlayer");
-    remainingCells[1].classList.add("secondPlayer");
-
-    // Créate player and weapon//
-    this.players.push(new Player("playerOne"));
-    this.players.push(new Player("playerTwo"));
-    // this.weapons.push(new Weapon("Pistol"));
-    console.log(this.players);
-    // console.log(this.weapons);
+    for (let i = 0; i < remainingCells.length; i++) {
+      remainingCells[i].innerHTML = this.players[i].name;
+    }
   }
 }
 
@@ -62,14 +64,8 @@ class GameMap {
 // Math.Random function aléatoire
 // floor arrondi a l'entier inferieur
 // ceil arrondi a l'entier superieur
-// document.querySelector(qs)
+// document.querySelector(qs) // ciblé un element
+//innertHtml recuperation d'un element
 // document.createElement("td")
 // element.appendChild(elements)
 // td.classList.add("obstacle"); ajouter une class
-
-// A FAIRE //
-
-// A chaque fois que je rajoutes un player ou une arme, met a jour `this.players` ou `this.weapons`
-//exemple: `this.players.push(new Player('playerOne'));`
-
-// ajouter les images pour les players et les weapons et remplace le background-color par l'utilisation de l'image (supprime la classe CSS)

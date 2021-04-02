@@ -6,14 +6,3 @@
 .obstacle {
   background-color: black;
 }
-
-.weapon {
-  background-color: blue;
-}
-
-.firstPlayer {
-  background-color: red;
-}
-.secondPlayer {
-  background-color: green;
-}

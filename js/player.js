@@ -1,9 +1,6 @@
 class Player {
-  constructor(name, x, y) {
+  constructor(name, image, x, y) {
     this.name = name;
-    this.img =
-      name === "playerOne"
-        ? "./image/players/playerOne.png"
-        : "./image/playerTwo.png";
+    this.img = `./image/players/${image}`;
   }
 }
