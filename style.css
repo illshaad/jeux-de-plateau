@@ -1,11 +1,29 @@
 .cell {
-  width: 64px;
-  height: 64px;
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border: 2px solid lightgray;
+  text-align: center;
 }
 
 .obstacle {
   background-color: black;
 }
 img {
+  position: absolute;
   width: 50px;
+  top: 10px;
+  left: 10px;
+}
+
+.moveable {
+  border: 2px solid rgb(9, 129, 145);
+}
+
+.player {
+  z-index: 5;
+}
+
+.weapon {
+  z-index: 2;
 }

@@ -1,21 +1,26 @@
 class Player {
-  constructor(name, defaultWeapon, image, map, x, y) {
+  constructor(name, weapon, map, x, y) {
     this.name = name;
-    this.defaultWeapon = defaultWeapon;
-    this.img = `./image/players/${image}`;
+    this.weapon = weapon;
+    this.imgTag = null;
     this.map = map;
     this.x = x;
     this.y = y;
+    this.updateImage();
   }
 
-  // move(direction) {}
+  move(x, y) {
+    this.x = x;
+    this.y = y;
+    this.map.grid[y][x].appendChild(this.imgTag);
+  }
+
+  updateImage() {
+    if (this.weapon === null) {
+      this.img = `./image/players/${this.name}.png`;
+      return;
+    }
+    this.img = `./image/weapon/${this.name}_${this.weapon.name}.png`;
+    this.imgTag.src = this.img;
+  }
 }
-
-// si il peut pas return false sinon true
-
-// horizontal = x
-// vertical = y
-
-// x: 1 , y:5  en haut : y -1 a gauche : x -1  a droit : x+1 en bas : y+1
-
-// verication si la case existe
