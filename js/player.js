@@ -6,7 +6,6 @@ class Player {
     this.map = map;
     this.x = x;
     this.y = y;
-    this.updateImage();
   }
 
   move(x, y) {
@@ -16,11 +15,12 @@ class Player {
   }
 
   updateImage() {
-    if (this.weapon === null) {
-      this.img = `./image/players/${this.name}.png`;
-      return;
-    }
-    this.img = `./image/weapon/${this.name}_${this.weapon.name}.png`;
+    console.log(this.weapon);
+    this.img =
+      this.weapon.name === "knife"
+        ? `./image/players/${this.name}.png`
+        : `./image/weapon/${this.name}_${this.weapon.name}.png`;
+
     this.imgTag.src = this.img;
   }
 }

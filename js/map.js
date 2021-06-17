@@ -8,6 +8,7 @@ class GameMap {
     this.cells = [];
     this.turn = 0;
     this.grid = [];
+    this.combat = false;
   }
 
   init() {
@@ -24,22 +25,18 @@ class GameMap {
 
     const arrayWeapon = [
       {
-        type: "pistol",
         damage: 8,
         name: "pistol",
       },
       {
-        type: "Sniper",
         damage: 20,
         name: "sniper",
       },
       {
-        type: "Rocket",
         damage: 10,
         name: "bazooka",
       },
       {
-        type: "Uzi",
         damage: 3,
         name: "uzi",
       },
@@ -47,16 +44,16 @@ class GameMap {
     for (let i = 0; i < weaponCells.length; i++) {
       // console.dir(weaponCells[i]);
       const newWeapon = new Weapon(
-        arrayWeapon[i].type,
         arrayWeapon[i].domage,
         arrayWeapon[i].name,
         this, //maps
         parseInt(weaponCells[i].dataset.x),
         parseInt(weaponCells[i].dataset.y)
       );
-      console.log(newWeapon);
+
       weaponCells[i].innerHTML = `<img src="${newWeapon.image}"/>`;
       newWeapon.imgTag = weaponCells[i].children[0];
+      newWeapon.imgTag.src;
       newWeapon.imgTag.classList.add("weapon");
       this.addWeapon(newWeapon);
     }
@@ -64,27 +61,37 @@ class GameMap {
     // generation player//
     const remainingCells = this.cells.slice(this.nbObstacle + nbWeapon);
 
+    const knifeOne = new Weapon(1, "knife", this, 0, 0);
+    const knifeTwo = new Weapon(1, "knife", this, 0, 0);
     //Création methode//
     //generation plays1
-    this.addPlayer(
-      new Player(
-        "playerOne",
-        null,
-        this,
-        parseInt(remainingCells[0].dataset.x),
-        parseInt(remainingCells[0].dataset.y)
-      )
-    );
+    const x1 = parseInt(remainingCells[0].dataset.x);
+    const y1 = parseInt(remainingCells[0].dataset.y);
+
+    this.addPlayer(new Player("playerOne", knifeOne, this, x1, y1));
     //generation plays2
-    this.addPlayer(
-      new Player(
-        "playerTwo",
-        null,
-        this,
-        parseInt(remainingCells[1].dataset.x),
-        parseInt(remainingCells[1].dataset.y)
-      )
-    );
+
+    let i = 1;
+
+    while (i < remainingCells.length) {
+      const x2 = parseInt(remainingCells[i].dataset.x);
+      const y2 = parseInt(remainingCells[i].dataset.y);
+      if (isAdjacent(x1, y1, x2, y2)) {
+        i++;
+        continue;
+      }
+      this.addPlayer(
+        new Player(
+          "playerTwo",
+          knifeTwo,
+          this,
+          parseInt(remainingCells[1].dataset.x),
+          parseInt(remainingCells[1].dataset.y)
+        )
+      );
+      break;
+    }
+
     this.players[0].imgTag = document.createElement("img");
     this.players[0].imgTag.src = this.players[0].img;
     this.players[1].imgTag = document.createElement("img");
@@ -92,8 +99,9 @@ class GameMap {
     this.players[0].imgTag.classList.add("player");
     this.players[1].imgTag.classList.add("player");
     remainingCells[0].appendChild(this.players[0].imgTag);
-    remainingCells[1].appendChild(this.players[1].imgTag);
-
+    remainingCells[i].appendChild(this.players[1].imgTag);
+    this.players[0].updateImage();
+    this.players[1].updateImage();
     this.start();
   }
 
@@ -202,12 +210,17 @@ class GameMap {
   }
 
   onCellClick(event) {
-    if (!event.target.classList.contains("moveable")) {
+    const target =
+      event.target.tagName === "IMG"
+        ? event.target.parentElement
+        : event.target;
+
+    if (!target.classList.contains("moveable")) {
       return;
     }
 
-    const x = parseInt(event.target.dataset.x);
-    const y = parseInt(event.target.dataset.y);
+    const x = parseInt(target.dataset.x);
+    const y = parseInt(target.dataset.y);
     this.players[this.turn].move(x, y);
 
     //recuperation l'arme qui ce trouve la meme cellule
