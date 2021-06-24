@@ -9,10 +9,21 @@ class GameMap {
     this.turn = 0;
     this.grid = [];
     this.combat = false;
+    this.action = {};
   }
 
   init() {
     //generation de la map //
+    this.action.attaqueP1 = document.getElementById("attaque-p1");
+    this.action.defenseP1 = document.getElementById("defense-p1");
+    this.action.attaqueP2 = document.getElementById("attaque-p2");
+    this.action.defenseP2 = document.getElementById("defense-p2");
+
+    this.action.attaqueP1.addEventListener("click", () => this.attaque(0));
+    this.action.defenseP1.addEventListener("click", () => this.defense(0));
+    this.action.attaqueP2.addEventListener("click", () => this.attaque(1));
+    this.action.defenseP2.addEventListener("click", () => this.defense(1));
+
     this.mapGeneration();
     //Generation des armes//
     this.generationObsctacle();
@@ -44,7 +55,7 @@ class GameMap {
     for (let i = 0; i < weaponCells.length; i++) {
       // console.dir(weaponCells[i]);
       const newWeapon = new Weapon(
-        arrayWeapon[i].domage,
+        arrayWeapon[i].damage,
         arrayWeapon[i].name,
         this, //maps
         parseInt(weaponCells[i].dataset.x),
@@ -92,6 +103,7 @@ class GameMap {
       break;
     }
 
+    console.log(this.players, "PLAYER");
     this.players[0].imgTag = document.createElement("img");
     this.players[0].imgTag.src = this.players[0].img;
     this.players[1].imgTag = document.createElement("img");
@@ -107,14 +119,54 @@ class GameMap {
 
   //function commencement du  joueur//
 
+  updateInfo() {
+    const armeP1 = document.getElementById("arme-p1");
+    const pvP1 = document.getElementById("pv-p1");
+    const paP1 = document.getElementById("pa-p1");
+    const armeP2 = document.getElementById("arme-p2");
+    const pvP2 = document.getElementById("pv-p2");
+    const paP2 = document.getElementById("pa-p2");
+
+    armeP1.textContent = this.players[0].weapon.name;
+    pvP1.textContent = this.players[0].pv;
+    paP1.textContent = this.players[0].weapon.damage;
+    armeP2.textContent = this.players[1].weapon.name;
+    pvP2.textContent = this.players[1].pv;
+    paP2.textContent = this.players[1].weapon.damage;
+
+    this.action.attaqueP1.disabled = !this.combat || !!this.turn;
+    this.action.defenseP1.disabled = !this.combat || !!this.turn;
+    this.action.attaqueP2.disabled = !this.combat || !this.turn;
+    this.action.defenseP2.disabled = !this.combat || !this.turn;
+
+    console.log({ combat: this.combat, turn: this.turn });
+  }
+
   start() {
+    if (
+      isAdjacent(
+        this.players[0].x,
+        this.players[0].y,
+        this.players[1].x,
+        this.players[1].y
+      )
+    ) {
+      this.combat = true;
+    }
+    this.updateInfo();
     //1°) verification le tour ?
+
     const player = this.players[this.turn];
 
     //2°)marquer les cases dispo facon visuel et en ajouter un click
     const cells = document.querySelectorAll(".cell");
     for (const cell of cells) {
       cell.classList.remove("moveable");
+    }
+
+    if (this.combat) return;
+
+    for (const cell of cells) {
       let { x, y } = cell.dataset;
       x = parseInt(x);
       y = parseInt(y);
@@ -246,6 +298,20 @@ class GameMap {
     obstacleCells.forEach((element) => {
       element.classList.add("obstacle");
     });
+  }
+
+  attaque(attaqeur) {
+    if (this.combat === false || attaqeur !== this.turn) return;
+    this.players[1 - attaqeur].takeDamage(this.players[attaqeur].weapon.damage);
+    this.turn = 1 - this.turn;
+    this.start();
+  }
+
+  defense(defenseur) {
+    if (this.combat === false || defenseur !== this.turn) return;
+    this.players[defenseur].defending = true;
+    this.turn = 1 - this.turn;
+    this.start();
   }
 }
 
