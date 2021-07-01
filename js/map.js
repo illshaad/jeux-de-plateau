@@ -10,10 +10,6 @@ class GameMap {
     this.grid = [];
     this.combat = false;
     this.action = {};
-  }
-
-  init() {
-    //generation de la map //
     this.action.attaqueP1 = document.getElementById("attaque-p1");
     this.action.defenseP1 = document.getElementById("defense-p1");
     this.action.attaqueP2 = document.getElementById("attaque-p2");
@@ -23,6 +19,21 @@ class GameMap {
     this.action.defenseP1.addEventListener("click", () => this.defense(0));
     this.action.attaqueP2.addEventListener("click", () => this.attaque(1));
     this.action.defenseP2.addEventListener("click", () => this.defense(1));
+  }
+
+  init() {
+    for (const player of this.players) {
+      $(player.imgTag).remove();
+    }
+    this.players.length = 0;
+    for (const weapon of this.weapons) {
+      $(weapon.imgTag).remove();
+    }
+    this.weapons.length = 0;
+
+    this.combat = false;
+
+    //generation de la map //
 
     this.mapGeneration();
     //Generation des armes//
@@ -36,19 +47,19 @@ class GameMap {
 
     const arrayWeapon = [
       {
-        damage: 8,
+        damage: 15,
         name: "pistol",
       },
       {
-        damage: 20,
+        damage: 30,
         name: "sniper",
       },
       {
-        damage: 10,
+        damage: 50,
         name: "bazooka",
       },
       {
-        damage: 3,
+        damage: 25,
         name: "uzi",
       },
     ];
@@ -72,8 +83,8 @@ class GameMap {
     // generation player//
     const remainingCells = this.cells.slice(this.nbObstacle + nbWeapon);
 
-    const knifeOne = new Weapon(1, "knife", this, 0, 0);
-    const knifeTwo = new Weapon(1, "knife", this, 0, 0);
+    const knifeOne = new Weapon(5, "knife", this, 0, 0);
+    const knifeTwo = new Weapon(5, "knife", this, 0, 0);
     //Création methode//
     //generation plays1
     const x1 = parseInt(remainingCells[0].dataset.x);
@@ -143,7 +154,13 @@ class GameMap {
   }
 
   start() {
+    const cells = document.querySelectorAll(".cell");
+    for (const cell of cells) {
+      cell.classList.remove("moveable");
+    }
+
     if (
+      !this.combat &&
       isAdjacent(
         this.players[0].x,
         this.players[0].y,
@@ -151,18 +168,16 @@ class GameMap {
         this.players[1].y
       )
     ) {
+      alert("le combat commence");
       this.combat = true;
     }
     this.updateInfo();
+
     //1°) verification le tour ?
 
     const player = this.players[this.turn];
 
     //2°)marquer les cases dispo facon visuel et en ajouter un click
-    const cells = document.querySelectorAll(".cell");
-    for (const cell of cells) {
-      cell.classList.remove("moveable");
-    }
 
     if (this.combat) return;
 
@@ -237,6 +252,7 @@ class GameMap {
     const height = this.height;
     const width = this.width;
     const map = document.querySelector("#map");
+    map.innerHTML = "";
     let i = 0;
     //Création des lignes
     while (i < height) {
@@ -287,7 +303,7 @@ class GameMap {
     // Pour savoir le tour du joueur suivant//
     // 1 - 0 => le deuxieme joueur  || 1-1 => le premiere joueur
     this.turn = 1 - this.turn;
-    this.start();
+    setTimeout(this.start.bind(this), 1);
   }
 
   //Generation des obstacles//
@@ -304,6 +320,10 @@ class GameMap {
     if (this.combat === false || attaqeur !== this.turn) return;
     this.players[1 - attaqeur].takeDamage(this.players[attaqeur].weapon.damage);
     this.turn = 1 - this.turn;
+    if (this.players[this.turn].pv <= 0) {
+      alert("le joueur " + this.players[attaqeur].name + " a gagné");
+      return this.init();
+    }
     this.start();
   }
 
