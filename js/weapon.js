@@ -9,8 +9,8 @@ class Weapon {
     this.y = y;
   }
 
+  //Function pickUp() récuperation de l'arme au sol et changement d'arme
   pickUp(player) {
-    console.log(this);
     this.imgTag.parentElement.removeChild(this.imgTag);
     this.imgTag = null;
     player.weapon.imgTag = document.createElement("img");
@@ -31,8 +31,3 @@ class Weapon {
     player.updateImage();
   }
 }
-
-//deposer une arme :
-//1°) crée une image
-//2°) on attribue src de l'image
-//3°) on depose l'image dans la bonne cellule

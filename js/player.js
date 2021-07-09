@@ -10,6 +10,7 @@ class Player {
     this.defending = false;
   }
 
+  //Function move() permet au placement du joueur
   move(x, y) {
     this.x = x;
     this.y = y;
@@ -25,7 +26,6 @@ class Player {
   }
 
   updateImage() {
-    console.log(this.weapon);
     this.img =
       this.weapon.name === "knife"
         ? `./image/players/${this.name}.png`

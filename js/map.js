@@ -21,6 +21,10 @@ class GameMap {
     this.action.defenseP2.addEventListener("click", () => this.defense(1));
   }
 
+  //Fonction Init() elle permet la géneration du jeux:
+  //Generation des joueurs ,  cartes , armes , placements des joueurs , placements des armes,
+  //ainsi que les obsctacles
+
   init() {
     for (const player of this.players) {
       $(player.imgTag).remove();
@@ -34,9 +38,9 @@ class GameMap {
     this.combat = false;
 
     //generation de la map //
-
     this.mapGeneration();
     //Generation des armes//
+    //Generation des obsctacle//
     this.generationObsctacle();
 
     const nbWeapon = 4;
@@ -64,7 +68,6 @@ class GameMap {
       },
     ];
     for (let i = 0; i < weaponCells.length; i++) {
-      // console.dir(weaponCells[i]);
       const newWeapon = new Weapon(
         arrayWeapon[i].damage,
         arrayWeapon[i].name,
@@ -72,7 +75,6 @@ class GameMap {
         parseInt(weaponCells[i].dataset.x),
         parseInt(weaponCells[i].dataset.y)
       );
-
       weaponCells[i].innerHTML = `<img src="${newWeapon.image}"/>`;
       newWeapon.imgTag = weaponCells[i].children[0];
       newWeapon.imgTag.src;
@@ -80,21 +82,16 @@ class GameMap {
       this.addWeapon(newWeapon);
     }
 
-    // generation player//
     const remainingCells = this.cells.slice(this.nbObstacle + nbWeapon);
-
     const knifeOne = new Weapon(5, "knife", this, 0, 0);
     const knifeTwo = new Weapon(5, "knife", this, 0, 0);
-    //Création methode//
-    //generation plays1
+
     const x1 = parseInt(remainingCells[0].dataset.x);
     const y1 = parseInt(remainingCells[0].dataset.y);
 
     this.addPlayer(new Player("playerOne", knifeOne, this, x1, y1));
-    //generation plays2
 
     let i = 1;
-
     while (i < remainingCells.length) {
       const x2 = parseInt(remainingCells[i].dataset.x);
       const y2 = parseInt(remainingCells[i].dataset.y);
@@ -114,7 +111,6 @@ class GameMap {
       break;
     }
 
-    console.log(this.players, "PLAYER");
     this.players[0].imgTag = document.createElement("img");
     this.players[0].imgTag.src = this.players[0].img;
     this.players[1].imgTag = document.createElement("img");
@@ -128,7 +124,8 @@ class GameMap {
     this.start();
   }
 
-  //function commencement du  joueur//
+  //function updateInfo() elle permet d'afficher le nom de l'arme ansi que les pv des joueur , elle permet de voir la gestion des dégat et les attaques.
+  //
 
   updateInfo() {
     const armeP1 = document.getElementById("arme-p1");
@@ -149,10 +146,11 @@ class GameMap {
     this.action.defenseP1.disabled = !this.combat || !!this.turn;
     this.action.attaqueP2.disabled = !this.combat || !this.turn;
     this.action.defenseP2.disabled = !this.combat || !this.turn;
-
-    console.log({ combat: this.combat, turn: this.turn });
   }
 
+  // Fonction Start() elle permet de controler si les mouvement du joueur sont sur la même
+  // Elle permet de vérifier  le tour du joueur
+  //
   start() {
     const cells = document.querySelectorAll(".cell");
     for (const cell of cells) {
@@ -173,11 +171,7 @@ class GameMap {
     }
     this.updateInfo();
 
-    //1°) verification le tour ?
-
     const player = this.players[this.turn];
-
-    //2°)marquer les cases dispo facon visuel et en ajouter un click
 
     if (this.combat) return;
 
@@ -186,11 +180,10 @@ class GameMap {
       x = parseInt(x);
       y = parseInt(y);
       //si la case n'est pas sur la meme ligne ni sur la meme colonne on zap
-
       if (x !== player.x && y !== player.y) {
         continue;
       }
-      //Si la distance entre la case et le joeur et de 4 ou plus on zap//
+      //Si la distance entre la case et le joueur et de 4 ou plus on zap//
       if (Math.abs(x - player.x) >= 4 || Math.abs(y - player.y) >= 4) {
         continue;
       }
@@ -200,7 +193,7 @@ class GameMap {
       }
       //recuperation le cell du joueur
       if (x !== player.x || y !== player.y) {
-        //Droit du joueur//
+        //Droite du joueur//
         if (x - player.x >= 2) {
           if (
             this.grid[y][x - 1].classList.contains("obstacle") ||
@@ -239,14 +232,16 @@ class GameMap {
     }
   }
 
+  //Generation du joueur//
   addPlayer(player) {
     this.players.push(player);
   }
-
+  // Generation de l'arme
   addWeapon(weapon) {
     this.weapons.push(weapon);
   }
 
+  // Function mapGeneration() création de la map avec tous les cellules verticales et horizontal
   mapGeneration() {
     this.grid = [];
     const height = this.height;
@@ -254,14 +249,12 @@ class GameMap {
     const map = document.querySelector("#map");
     map.innerHTML = "";
     let i = 0;
-    //Création des lignes
     while (i < height) {
       const tr = document.createElement("tr");
       tr.classList.add("row-" + i.toString());
       map.appendChild(tr);
       let j = 0;
       let row = [];
-      //Création des carré
       while (j < width) {
         const td = document.createElement("td");
         td.addEventListener("click", (event) => this.onCellClick(event));
@@ -277,6 +270,8 @@ class GameMap {
     }
   }
 
+  //Function onCellClick elle permet au joueurs de récuperation d'une arme.
+  // Elle permet de controler le tour du joueurs suivant
   onCellClick(event) {
     const target =
       event.target.tagName === "IMG"
@@ -296,12 +291,7 @@ class GameMap {
     if (weapon !== undefined) {
       weapon.pickUp(this.players[this.turn]);
     }
-    //Changer l'image du joueur//
-    // this.player.imgTag.src =
-    //   this.players[this.turn] + this.map.turn + this.weapons.imgTag;
-
     // Pour savoir le tour du joueur suivant//
-    // 1 - 0 => le deuxieme joueur  || 1-1 => le premiere joueur
     this.turn = 1 - this.turn;
     setTimeout(this.start.bind(this), 1);
   }
@@ -316,6 +306,7 @@ class GameMap {
     });
   }
 
+  //Function attaque permet que le joueurs puisse attaquer avec l'arme qu'elle détient
   attaque(attaqeur) {
     if (this.combat === false || attaqeur !== this.turn) return;
     this.players[1 - attaqeur].takeDamage(this.players[attaqeur].weapon.damage);
@@ -327,6 +318,7 @@ class GameMap {
     this.start();
   }
 
+  //Function defense permet que le joueurs puisse se défendre
   defense(defenseur) {
     if (this.combat === false || defenseur !== this.turn) return;
     this.players[defenseur].defending = true;
@@ -334,25 +326,3 @@ class GameMap {
     this.start();
   }
 }
-
-// const test = -6 - 20 ;
-//Math.abs(test)
-//Selector toujours une String//
-// Math.Random function aléatoire
-// floor arrondi a l'entier inferieur
-// ceil arrondi a l'entier superieur
-// document.querySelector(qs) // ciblé un element
-//innertHtml recuperation d'un element
-// document.createElement("td")
-// element.appendChild(elements)
-// td.classList.add("obstacle"); ajouter une class
-
-//Regrouper dans des methodes
-// Il faut pas que les player soie côte à côte .//
-//trouver les bonnes images
-
-//RAMASSER UNE ARME::
-
-//1°) il faut que l'image disparait de la map
-//2°) Ramasser une arme mettre à jour l'image du joueur
-// 3°) mise à jour les dégats du joueur
